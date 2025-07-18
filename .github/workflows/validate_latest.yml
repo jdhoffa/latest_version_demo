@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'schema/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'schema/**'
 
 jobs:
   validate-latest-schema:
