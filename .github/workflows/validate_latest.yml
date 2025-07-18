@@ -1,0 +1,27 @@
+name: Validate Latest Schema
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'schema/**'
+
+jobs:
+  validate-latest-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Identify highest version schema directory
+        id: find-version
+        run: |
+          latest_version=$(ls schema/ | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+          echo "latest_version=$latest_version" >> "$GITHUB_OUTPUT"
+          echo "Latest version directory: $latest_version"
+
+      - name: Compare latest to highest version
+        run: |
+          diff_output=$(diff -r schema/latest schema/${{ steps.find-version.outputs.latest_version }}) || (echo "$diff_output"; exit 1)
+          echo "✅ 'latest' schema matches highest version: ${{ steps.find-version.outputs.latest_version }}"
+
